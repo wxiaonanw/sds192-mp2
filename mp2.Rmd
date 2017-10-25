@@ -8,6 +8,12 @@ output: html_document
 
 ## Loading the data
 
+<<<<<<< HEAD
+=======
+This project is so interesting and relevant to my life! I love this class!!
+
+yolo
+>>>>>>> 85acd30b0973afeb33bca72f99c902077e4397fd
 
 ```{r, include=FALSE}
 load("house_elections.rda")
