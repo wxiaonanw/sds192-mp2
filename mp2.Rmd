@@ -42,7 +42,7 @@ ind_can_prty <- ind_can_prty %>%
   mutate(cand_party_affiliation = factor(cand_party_affiliation), 
          category = factor(category)) %>% 
   select(cand_party_affiliation, category) %>% 
-  filter(cand_party_affiliation != "Unknown") %>% 
+  filter(cand_party_affiliation != "UNK") %>% 
   group_by(cand_party_affiliation, category) %>% 
   summarize(n = n())
 
