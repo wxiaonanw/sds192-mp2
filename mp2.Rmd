@@ -8,9 +8,66 @@ output: html_document
 
 ## Loading the data
 
+```{r setup, include=FALSE, message=FALSE}
+library(tidyverse)
+library(dplyr)
+```
+
+
 ```{r, include=FALSE}
 load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
 ```
+
+```{r warning=FALSE}
+ind_can_prty <- contributions %>% 
+  select(cmte_id, transaction_amt) %>% 
+  left_join(committees, by = "cmte_id") %>% 
+  select(cmte_id, transaction_amt, cmte_type, cand_id) %>% 
+  filter(cand_id!="") %>% 
+  filter(cmte_type == "H") %>% 
+  left_join(candidates, by = "cand_id") %>% 
+  select(transaction_amt, cmte_id, cand_id, cand_name,
+         cand_party_affiliation)
+
+ind_can_prty$category[ind_can_prty$transaction_amt>5000] <- "high"
+ind_can_prty$category[ind_can_prty$transaction_amt<=5000] <- "low"
+ind_can_prty$category <- cut(ind_can_prty$transaction_amt, 
+                     breaks = c(-Inf, 500,1000,2000,5000,10000, Inf), 
+                     labels = c("200-500","501-1000","1001-2000",
+                                "2001-5000","5001-10000","Over 10000"))
+ind_can_prty <- ind_can_prty %>% 
+  mutate(cand_party_affiliation = factor(cand_party_affiliation), 
+         category = factor(category)) %>% 
+  select(cand_party_affiliation, category) %>% 
+  filter(cand_party_affiliation != "Unknown") %>% 
+  group_by(cand_party_affiliation, category) %>% 
+  summarize(n = n())
+
+dem_ind_can_prty <- ind_can_prty %>% 
+  filter(cand_party_affiliation == "DEM")
+```
+
+```{r}
+plot_prty <- function(df){
+  df <- df  %>% arrange(cand_party_affiliation)
+  df %>% ggplot(aes(x = cand_party_affiliation, y = n, fill = category)) + 
+    geom_bar(position = "fill", stat = "identity", width = .5) + 
+    scale_fill_brewer(palette = "Pastel1") + 
+    xlab("Party of Committee's Affiliated Candidate") + 
+    ylab("Percentage of Donors") + 
+    scale_y_reverse()
+}
+```
+
+```{r}
+plot_prty(dem_ind_can_prty)
+
+plot_prty(ind_can_prty) + 
+  scale_x_discrete(label = c("Democratic", "DFL", 
+                             "Green", "Independent", 
+                             "Republican"))
+```
+
