@@ -22,40 +22,44 @@ load("contributions.rda")
 ```
 
 ```{r warning=FALSE}
+# Cleaning the data
 ind_can_prty <- contributions %>% 
   select(cmte_id, transaction_amt) %>% 
-  left_join(committees, by = "cmte_id") %>% 
-  select(cmte_id, transaction_amt, cmte_type, cand_id) %>% 
-  filter(cand_id!="") %>% 
-  filter(cmte_type == "H") %>% 
-  left_join(candidates, by = "cand_id") %>% 
+  left_join(committees, by = "cmte_id") %>%                   #adding the committees information to donations
+  select(cmte_id, transaction_amt, cmte_type, cand_id) %>%
+  filter(cand_id!="") %>%                                     #only examine at the campaign committees
+  filter(cmte_type == "H") %>%                                #further limit to those affiliated to candidates for the House
+  left_join(candidates, by = "cand_id") %>%                   #obtain the party affiliation of candidates
   select(transaction_amt, cmte_id, cand_id, cand_name,
          cand_party_affiliation)
 
+# Dividing the donation amounts into categories
+# breaks decided from some exploration of data, process omitted
 ind_can_prty$category[ind_can_prty$transaction_amt>5000] <- "high"
 ind_can_prty$category[ind_can_prty$transaction_amt<=5000] <- "low"
 ind_can_prty$category <- cut(ind_can_prty$transaction_amt, 
                      breaks = c(-Inf, 500,1000,2000,5000,10000, Inf), 
                      labels = c("200-500","501-1000","1001-2000",
                                 "2001-5000","5001-10000","Over 10000"))
+
+# Further prepare the data for graphing
 ind_can_prty <- ind_can_prty %>% 
   mutate(cand_party_affiliation = factor(cand_party_affiliation), 
          category = factor(category)) %>% 
   select(cand_party_affiliation, category) %>% 
-  filter(cand_party_affiliation != "UNK") %>% 
+  filter(cand_party_affiliation != "UNK") %>%        #filter out the donation that went to candidates without party info
   group_by(cand_party_affiliation, category) %>% 
   summarize(n = n())
-
-dem_ind_can_prty <- ind_can_prty %>% 
-  filter(cand_party_affiliation == "DEM")
 ```
 
 ```{r}
+# Function to create plot
 plot_prty <- function(df){
   df <- df  %>% arrange(cand_party_affiliation)
   df %>% ggplot(aes(x = cand_party_affiliation, y = n, fill = category)) + 
     geom_bar(position = "fill", stat = "identity", width = .5) + 
-    scale_fill_brewer(palette = "Pastel1") + 
+    scale_fill_brewer(name = "Donation in dollars", 
+                      palette = "Pastel1") + 
     xlab("Party of Committee's Affiliated Candidate") + 
     ylab("Percentage of Donors") + 
     scale_y_reverse()
@@ -63,10 +67,17 @@ plot_prty <- function(df){
 ```
 
 ```{r}
-plot_prty(dem_ind_can_prty)
+# Plotting the data for the Democratic Party
+dem_ind_can_prty <- ind_can_prty %>% 
+  filter(cand_party_affiliation == "DEM")
+plot_prty(dem_ind_can_prty) + 
+  scale_x_discrete(label = "Democratic")
+```
 
+```{r}
+# Comparing all five parties together
 plot_prty(ind_can_prty) + 
-  scale_x_discrete(label = c("Democratic", "DFL", 
+  scale_x_discrete(label = c("Democratic", "Dem-Farm-Labor", 
                              "Green", "Independent", 
                              "Republican"))
 ```
