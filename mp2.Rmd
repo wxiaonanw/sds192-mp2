@@ -1,18 +1,25 @@
 ---
 title: "Mini-Project 2"
-author: "Your Name Here"
+author: "Vivian Wang, Maggie Wang"
 date: "October 31, 2017"
 output: html_document
 ---
 
+# Distribution of Donations to House Candidates
 
-## Loading the data
+> From this data, we can learn about the distribution of amounts donated by individuals to campaign committees of different party candidates for the House of Representatives. 
+
+
+## Notes
+
+* The threshold for an individual’s donation to be recorded in the 2011-2012 election cycle was $200. 
+
+* The donations were counted into one of 6 categories based on monetary amount: $200-$500, $501-$1000, $1001-$2000, $2001-$5000,$5001-$10,000, and over $10,000.
 
 ```{r setup, include=FALSE, message=FALSE}
 library(tidyverse)
 library(dplyr)
 ```
-
 
 ```{r, include=FALSE}
 load("house_elections.rda")
@@ -66,6 +73,11 @@ plot_prty <- function(df){
 }
 ```
 
+
+> The bars show the percentage of donations that came from each category for each party affiliations.
+
+## The Democratic Party
+
 ```{r}
 # Plotting the data for the Democratic Party
 dem_ind_can_prty <- ind_can_prty %>% 
@@ -73,6 +85,17 @@ dem_ind_can_prty <- ind_can_prty %>%
 plot_prty(dem_ind_can_prty) + 
   scale_x_discrete(label = "Democratic")
 ```
+
+### Here's what we found:
+
+* The greatest proportion of donations to Democratic candidates fell within the $501-$1000 range. The next highest proportion of donations was within the $1001-$2000 range. 
+
+* The smallest proportion of donations fell within the $2001-$5000 range while no individual donations exceeded $5001. Surprisingly, a relatively small proportion of donations were in the smallest-amount category ($200-$500). We expected this category to have a much higher percentage as historically, the economic backgrounds of individuals favoring the Democratic party are lower in comparison to other parties such as the Republicans.  
+
+
+## What about the other parties?
+
+This graphic displays the distribution of donation amounts to campaign committees of House candidates from 5 party affiliations: Democratic, Republican, Green, Democratic Farmer Labor, and independent. 
 
 ```{r}
 # Comparing all five parties together
@@ -82,3 +105,13 @@ plot_prty(ind_can_prty) +
                              "Republican"))
 ```
 
+
+### Here is what we found:
+
+* Compared to the other parties, the Green candidates by far had the most smallest-amount donations ($200-$500).
+
+* The Republican candidates had the most donations with amounts over $2,000; in fact, they were the only party that had individual donations of amounts beyond $10,000. 
+
+* Interestingly, the Democrats and Republicans had similar proportions of small-amount donations ($200-$500 and $501-$1000) which was unexpected because we had thought that the Republicans would have a much smaller proportion of small-amount donations. Instead, the Republicans actually had a higher proportion of $200-$500 donations than the Democrats. 
+
+* Finally, independent candidates had the highest percentage of $1001-$2000 donations amongst the parties. This was interesting because we had hypothesized that candidates from more established parties like the Republican Party would have a greater proportion of donations within this relatively high monetary range.
