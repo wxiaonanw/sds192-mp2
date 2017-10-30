@@ -19,6 +19,7 @@ output: html_document
 ```{r setup, include=FALSE, message=FALSE}
 library(tidyverse)
 library(dplyr)
+library(scales)
 ```
 
 ```{r, include=FALSE}
@@ -66,7 +67,8 @@ plot_prty <- function(df){
     scale_fill_brewer(name = "Donation in dollars", 
                       palette = "Pastel1") + 
     xlab("Party of Committee's Affiliated Candidate") + 
-    ylab("Percentage of Donors")
+    ylab("Percentage of Donors") + 
+    scale_y_continuous(labels = percent_format())
 }
 ```
 
