@@ -35,7 +35,7 @@ ind_can_prty <- contributions %>%
   left_join(committees, by = "cmte_id") %>%                   #adding the committees information to donations
   select(cmte_id, transaction_amt, cmte_type, cand_id) %>%
   filter(cand_id!="") %>%                                     #only examine at the campaign committees
-  filter(cmte_type == "H") %>%                                #further limit to those affiliated to candidates for the House
+  filter(cmte_type == "H") %>%                                #limit to those affiliated to House candidates
   left_join(candidates, by = "cand_id") %>%                   #obtain the party affiliation of candidates
   select(transaction_amt, cmte_id, cand_id, cand_name,
          cand_party_affiliation)
@@ -44,15 +44,15 @@ ind_can_prty <- contributions %>%
 # breaks decided from some exploration of data, process omitted
 ind_can_prty$category <- cut(ind_can_prty$transaction_amt, 
                      breaks = c(-Inf, 500,1000,2000,Inf), 
-                     labels = c("200-500","501-1000","1001-2000","Over 2000")
-                     levels = c("Over 2000", "1001-2000", "501-1000", "200-500"))
+                     labels = c("200-500","501-1000","1001-2000","Over 2000"))
 
 # Further prepare the data for graphing
 ind_can_prty <- ind_can_prty %>% 
   mutate(cand_party_affiliation = factor(cand_party_affiliation), 
-         category = factor(category)) %>% 
+         category = factor(category, 
+                     levels = c("Over 2000", "1001-2000", "501-1000", "200-500"))) %>% 
   select(cand_party_affiliation, category) %>% 
-  filter(cand_party_affiliation != "UNK") %>%        #filter out the donation that went to candidates without party info
+  filter(cand_party_affiliation != "UNK") %>%        #filter out donations to candidates without party info
   group_by(cand_party_affiliation, category) %>% 
   summarize(n = n())
 ```
