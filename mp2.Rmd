@@ -43,9 +43,9 @@ ind_can_prty <- contributions %>%
 # Dividing the donation amounts into categories
 # breaks decided from some exploration of data, process omitted
 ind_can_prty$category <- cut(ind_can_prty$transaction_amt, 
-                     breaks = c(-Inf, 500,1000,2000,5000,10000, Inf), 
-                     labels = c("200-500","501-1000","1001-2000",
-                                "2001-5000","5001-10000","Over 10000"))
+                     breaks = c(-Inf, 500,1000,2000,Inf), 
+                     labels = c("200-500","501-1000","1001-2000","Over 2000")
+                     levels = c("Over 2000", "1001-2000", "501-1000", "200-500"))
 
 # Further prepare the data for graphing
 ind_can_prty <- ind_can_prty %>% 
@@ -66,8 +66,7 @@ plot_prty <- function(df){
     scale_fill_brewer(name = "Donation in dollars", 
                       palette = "Pastel1") + 
     xlab("Party of Committee's Affiliated Candidate") + 
-    ylab("Percentage of Donors") + 
-    scale_y_reverse()
+    ylab("Percentage of Donors")
 }
 ```
 
